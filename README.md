@@ -13,6 +13,8 @@ Most backend systems rely on rigid abstraction layers that hinder flexibility, o
     AI-enhanced optimization mirrors neural plasticity, where connections strengthen or weaken based on usage.
 
 2. Bio-Driven Component Mapping
+For a detailed explanation of each component, see [Bio-Driven Component Mapping](./docs/bio-driven-component-mapping.md).
+
 Biological System	Backend Equivalent	Function
 🧬 Foundational DNA	Genetic Code Primitives	Represents immutable principles, forming the backend's core foundation.
 🧪 Functional Molecules	Metabolic Enzymes	Encapsulates reusable logic, such as formatting, validation, and encryption.
@@ -30,6 +32,7 @@ Biological System	Backend Equivalent	Function
 (Note: An emoji-free version of this table is available in the Appendix.)
 
 3. AI-Driven Adaptation in Bio-Driven Design
+Further details on AI integration can be found in [AI-Driven Adaptation](./docs/ai-driven-adaptation.md).
 
 3.1 Neural Plasticity for Dynamic Optimization
 
@@ -52,6 +55,7 @@ Biological System	Backend Equivalent	Function
     Autonomous policy engines adjust Hormonal Signals dynamically in response to system feedback from the Neurotransmitter Network.
 
 4. Implementation Strategies
+For specific technologies and approaches, refer to [Implementation Strategies](./docs/implementation-strategies.md).
 
 4.1 Core System Components
 
@@ -69,6 +73,7 @@ Biological System	Backend Equivalent	Function
     AI-led predictive scaling ensures efficient workload distribution for Autonomous Cells leveraging tools like Kubernetes HPA with custom metrics or cloud provider autoscaling with AI/ML predictions.
 
 5. Future Applications & Expansion
+Explore potential future directions in [Future Applications & Expansion](./docs/future-applications.md).
 
     AI-driven predictive maintenance—detecting and resolving issues proactively within Autonomous Cells using anomaly detection and forecasting models.
     Integration with autonomous AI agents for adaptive workload balancing and resource allocation for Autonomous Cells based on real-time demand within the Neurotransmitter Network.
@@ -76,3 +81,4 @@ Biological System	Backend Equivalent	Function
 
 6. Conclusion
 Bio-Driven Backend Design transforms backend architecture by blending modularity with AI-driven adaptation. Inspired by biological systems, this framework enables self-improving, scalable, and resilient architectures ideal for modern computational challenges.
+Read the full [Conclusion](./docs/conclusion.md).
