@@ -32,7 +32,7 @@ Metabolic enzymes in biology catalyze biochemical reactions, transforming substr
 **Detailed Explanation:**
 Cellular organelles (like mitochondria or the Golgi apparatus) are specialized subunits within a cell that perform specific functions. Similarly, Domain Modules in BDBD represent distinct business capabilities or services. Each module encapsulates the logic, data, and rules relevant to a particular domain, such as user management, order processing, or inventory control. They are self-contained units of business functionality, interacting with other modules to achieve broader system goals.
 
----
+A Cellular Organelle represents a logical domain grouping; multiple Organelles might be composed within a single **Autonomous Cell**, or a sufficiently complex Organelle could itself be realized as an **Autonomous Cell**. They interact with other modules, often via defined **Synaptic Pathways** if communication is external to their immediate containing unit.
 
 ### 🧵 Synaptic Pathways
 *Biological System: Service Connectors*
@@ -81,6 +81,7 @@ The cytoskeleton provides structural support to biological cells and helps maint
 
 **Detailed Explanation:**
 The vascular system in organisms transports blood, nutrients, and oxygen. Vascular Channels in BDBD represent the underlying data transport mechanisms (e.g., gRPC, HTTP/2, message queue protocols) that facilitate the efficient and structured flow of data between components. These channels are optimized for different types of data and communication patterns, ensuring that information reaches its destination reliably and with minimal latency.
+These channels often serve as the physical transport layer for communications defined by **Synaptic Pathways** and messages traversing the **Neurotransmitter Network**.
 
 ---
 

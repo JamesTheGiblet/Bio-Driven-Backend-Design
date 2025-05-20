@@ -104,6 +104,4 @@ BDBD is about creating systems that can evolve.
 
 Applying Bio-Driven Backend Design is a journey towards building more resilient, scalable, and intelligent systems. By following these phases and embracing an iterative approach, teams can leverage the power of biological inspiration to tackle modern software engineering challenges effectively. Remember that BDBD provides a conceptual framework; the specific implementation details will vary based on your project's unique context and requirements.
 
----
-
-*This guide should be considered a living document and can be expanded with more specific examples or case studies as the BDBD framework matures.*
+As such, this guide itself is intended to evolve alongside the BDBD framework and community experiences.
