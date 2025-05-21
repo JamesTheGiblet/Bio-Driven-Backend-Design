@@ -34,9 +34,10 @@ def run_system_demo():
 
     # 4. Subscribe Cortex (or other components) to relevant events
     # This allows for reactive, event-driven behavior.
-    # Ensure the event type matches what the cell publishes (e.g., "{cell_id}.task.complete")
-    event_bus.subscribe(f"{cell1_id}.task.complete", cortex.handle_task_complete_event)
-    event_bus.subscribe(f"{cell2_id}.task.complete", cortex.handle_task_complete_event)
+    # Event types are now more specific, like "{cell_id}.{action}.complete"
+    # Cortex now has specific handlers for different types of completions.
+    event_bus.subscribe(f"{cell1_id}.analyze_data.complete", cortex.handle_data_analysis_complete)
+    event_bus.subscribe(f"{cell2_id}.send_notification.complete", cortex.handle_notification_sent)
     # You could also have cells subscribe to each other's events if needed.
 
 
@@ -44,22 +45,8 @@ def run_system_demo():
     # The Cortex delegates work to the appropriate cells.
     print(f"\nMain: Attempting to delegate 'analyze_data' task to {cell1_id}.")
     task1_payload = {"action": "analyze_data", "source_id": "sensor_A01", "data_points": [1,2,3,4,5]}
-    result1 = cortex.delegate_task_to_cell(cell1_id, task1_payload)
-
-    if result1 and isinstance(result1, dict):
-        print(f"\nMain: Task for {cell1_id} ({task1_payload.get('action')}) completed with status: {result1.get('status', 'unknown')}")
-        # Potentially trigger another task based on result1
-        if result1.get('status') == 'success':
-            print(f"\nMain: Attempting to delegate 'send_notification' task to {cell2_id} based on {cell1_id}'s success.")
-            task2_payload = {"action": "send_notification", "recipient": "admin@example.com", "message": f"Analysis by {cell1_id} complete."}
-            cortex.delegate_task_to_cell(cell2_id, task2_payload)
-
-    elif result1 is None:
-        print(f"\nMain: Task delegation to {cell1_id} failed or cell did not return a result.")
-    else:
-        print(f"\nMain: Task delegated to {cell1_id} returned an unexpected result type: {type(result1)}")
-
-
+    # The main script just initiates the first task. Chaining happens inside the Cortex.
+    cortex.delegate_task_to_cell(cell1_id, task1_payload)
     # Add more complex interactions, error handling, or AI-driven adaptations here as the system evolves.
 
     print(f"\n--- BDBD System Demo for: {principles.SYSTEM_NAME} Finished ---")

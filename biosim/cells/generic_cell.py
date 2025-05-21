@@ -28,11 +28,12 @@ class GenericCell:
         #     print(f"Cell '{self.cell_id}': DNA-based threshold exceeded for 'some_value'.")
 
         # Simulate processing based on task_data
-        processed_info = f"Task '{task_data.get('action', 'unknown_action')}' processed by {self.cell_id}."
-        result = {"status": "success", "cell_id": self.cell_id, "input_data": task_data, "processed_info": processed_info}
+        action_performed = task_data.get('action', 'unknown_action') # Capture the action
+        processed_info = f"Task '{action_performed}' processed by {self.cell_id}."
+        result = {"status": "success", "cell_id": self.cell_id, "action_performed": action_performed, "input_data": task_data, "processed_info": processed_info}
         print(f"GenericCell '{self.cell_id}': Task completed. Result: {result}")
 
         # Publish a completion event
-        # Choose a meaningful event_type for your system, e.g., based on cell_id or task type
-        self.event_bus.publish(f"{self.cell_id}.task.complete", result)
+        # Event type now includes the action performed for more specific subscriptions
+        self.event_bus.publish(f"{self.cell_id}.{action_performed}.complete", result)
         return result

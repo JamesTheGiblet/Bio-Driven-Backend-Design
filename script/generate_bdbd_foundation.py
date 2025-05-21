@@ -86,13 +86,14 @@ class GenericCell:
         #     print(f"Cell '{{self.cell_id}}': DNA-based threshold exceeded for 'some_value'.")
 
         # Simulate processing based on task_data
-        processed_info = f"Task '{{task_data.get('action', 'unknown_action')}}' processed by {{self.cell_id}}."
-        result = {{"status": "success", "cell_id": self.cell_id, "input_data": task_data, "processed_info": processed_info}}
+        action_performed = task_data.get('action', 'unknown_action') # Capture the action
+        processed_info = f"Task '{{action_performed}}' processed by {{self.cell_id}}."
+        result = {{"status": "success", "cell_id": self.cell_id, "action_performed": action_performed, "input_data": task_data, "processed_info": processed_info}}
         print(f"GenericCell '{{self.cell_id}}': Task completed. Result: {{result}}")
 
         # Publish a completion event
-        # Choose a meaningful event_type for your system, e.g., based on cell_id or task type
-        self.event_bus.publish(f"{{self.cell_id}}.task.complete", result)
+        # Event type now includes the action performed for more specific subscriptions
+        self.event_bus.publish(f"{{self.cell_id}}.{{action_performed}}.complete", result)
         return result
 """
 
@@ -114,10 +115,9 @@ class CortexOrchestrator:
         self.cells = {{}} # Stores registered cell instances: {{'cell_id': cell_instance}}
         print(f"CortexOrchestrator for {system_name} initialized.")
 
-        # Example: Subscribe to a generic completion event pattern if your bus supports it,
-        # or subscribe to specific events in the main application setup (see main.py).
-        # self.event_bus.subscribe("*.task.complete", self.handle_any_task_complete_event)
-
+        # Subscriptions will now be more specific and handled in main.py
+        # or dynamically if the Cortex becomes more advanced.
+        
     def register_cell(self, cell): # Consider adding type hint: cell: GenericCell
         \"\"\"Registers a cell with the orchestrator.\"\"\"
         if hasattr(cell, 'cell_id'):
@@ -142,15 +142,32 @@ class CortexOrchestrator:
             print(f"Cortex: Error - Cell '{{cell_id}}' not found.")
             return None
 
-    def handle_task_complete_event(self, event_data):
+    def handle_data_analysis_complete(self, event_data):
         \"\"\"
-        Handles generic task completion events from cells.
-        This method needs to be subscribed to specific event types in the main setup (see main.py).
+        Handles completion of a 'analyze_data' task and may trigger a notification.
         \"\"\"
         cell_id = event_data.get('cell_id', 'UnknownCell')
-        print(f"Cortex: Received task completion event from '{{cell_id}}'. Data: {{event_data}}")
-        # Add logic here to react to task completions,
-        # potentially chain tasks, make higher-level decisions, or trigger AI adaptations.
+        print(f"Cortex: Received 'analyze_data.complete' event from '{{cell_id}}'. Data: {{event_data}}")
+
+        if event_data.get('status') == 'success':
+            # Decision: If data analysis was successful, trigger a notification.
+            # In a real system, the target notifier cell might be determined by DNA principles or other logic.
+            notifier_cell_id = "notifier_beta" # Assuming this cell is registered
+            if notifier_cell_id in self.cells:
+                print(f"Cortex: Data analysis by '{{cell_id}}' successful. Triggering notification via '{{notifier_cell_id}}'.")
+                notification_payload = {{
+                    "action": "send_notification",
+                    "recipient": "admin@example.com", # Could come from DNA or event_data
+                    "message": f"Analysis by {{cell_id}} for action '{{event_data.get('action_performed')}}' complete. Details: {{event_data.get('processed_info')}}"
+                }}
+                self.delegate_task_to_cell(notifier_cell_id, notification_payload)
+            else:
+                print(f"Cortex: Warning - Notifier cell '{{notifier_cell_id}}' not found for chaining.")
+
+    def handle_notification_sent(self, event_data):
+        \"\"\"Handles completion of a 'send_notification' task.\"\"\"
+        cell_id = event_data.get('cell_id', 'UnknownCell')
+        print(f"Cortex: Received 'send_notification.complete' event from '{{cell_id}}'. Notification details: {{event_data.get('processed_info')}}")
 """
 
 MAIN_PY_CONTENT = """\"\"\"
@@ -189,9 +206,10 @@ def run_system_demo():
 
     # 4. Subscribe Cortex (or other components) to relevant events
     # This allows for reactive, event-driven behavior.
-    # Ensure the event type matches what the cell publishes (e.g., "{{cell_id}}.task.complete")
-    event_bus.subscribe(f"{{cell1_id}}.task.complete", cortex.handle_task_complete_event)
-    event_bus.subscribe(f"{{cell2_id}}.task.complete", cortex.handle_task_complete_event)
+    # Event types are now more specific, like "{{cell_id}}.{{action}}.complete"
+    # Cortex now has specific handlers for different types of completions.
+    event_bus.subscribe(f"{{cell1_id}}.analyze_data.complete", cortex.handle_data_analysis_complete)
+    event_bus.subscribe(f"{{cell2_id}}.send_notification.complete", cortex.handle_notification_sent)
     # You could also have cells subscribe to each other's events if needed.
 
 
@@ -199,22 +217,8 @@ def run_system_demo():
     # The Cortex delegates work to the appropriate cells.
     print(f"\\nMain: Attempting to delegate 'analyze_data' task to {{cell1_id}}.")
     task1_payload = {{"action": "analyze_data", "source_id": "sensor_A01", "data_points": [1,2,3,4,5]}}
-    result1 = cortex.delegate_task_to_cell(cell1_id, task1_payload)
-
-    if result1 and isinstance(result1, dict):
-        print(f"\\nMain: Task for {{cell1_id}} ({{task1_payload.get('action')}}) completed with status: {{result1.get('status', 'unknown')}}")
-        # Potentially trigger another task based on result1
-        if result1.get('status') == 'success':
-            print(f"\\nMain: Attempting to delegate 'send_notification' task to {{cell2_id}} based on {{cell1_id}}'s success.")
-            task2_payload = {{"action": "send_notification", "recipient": "admin@example.com", "message": f"Analysis by {{cell1_id}} complete."}}
-            cortex.delegate_task_to_cell(cell2_id, task2_payload)
-
-    elif result1 is None:
-        print(f"\\nMain: Task delegation to {{cell1_id}} failed or cell did not return a result.")
-    else:
-        print(f"\\nMain: Task delegated to {{cell1_id}} returned an unexpected result type: {{type(result1)}}")
-
-
+    # The main script just initiates the first task. Chaining happens inside the Cortex.
+    cortex.delegate_task_to_cell(cell1_id, task1_payload)
     # Add more complex interactions, error handling, or AI-driven adaptations here as the system evolves.
 
     print(f"\\n--- BDBD System Demo for: {{principles.SYSTEM_NAME}} Finished ---")

@@ -16,10 +16,9 @@ class CortexOrchestrator:
         self.cells = {} # Stores registered cell instances: {'cell_id': cell_instance}
         print(f"CortexOrchestrator for biosim initialized.")
 
-        # Example: Subscribe to a generic completion event pattern if your bus supports it,
-        # or subscribe to specific events in the main application setup (see main.py).
-        # self.event_bus.subscribe("*.task.complete", self.handle_any_task_complete_event)
-
+        # Subscriptions will now be more specific and handled in main.py
+        # or dynamically if the Cortex becomes more advanced.
+        
     def register_cell(self, cell): # Consider adding type hint: cell: GenericCell
         """Registers a cell with the orchestrator."""
         if hasattr(cell, 'cell_id'):
@@ -44,12 +43,29 @@ class CortexOrchestrator:
             print(f"Cortex: Error - Cell '{cell_id}' not found.")
             return None
 
-    def handle_task_complete_event(self, event_data):
+    def handle_data_analysis_complete(self, event_data):
         """
-        Handles generic task completion events from cells.
-        This method needs to be subscribed to specific event types in the main setup (see main.py).
+        Handles completion of a 'analyze_data' task and may trigger a notification.
         """
         cell_id = event_data.get('cell_id', 'UnknownCell')
-        print(f"Cortex: Received task completion event from '{cell_id}'. Data: {event_data}")
-        # Add logic here to react to task completions,
-        # potentially chain tasks, make higher-level decisions, or trigger AI adaptations.
+        print(f"Cortex: Received 'analyze_data.complete' event from '{cell_id}'. Data: {event_data}")
+
+        if event_data.get('status') == 'success':
+            # Decision: If data analysis was successful, trigger a notification.
+            # In a real system, the target notifier cell might be determined by DNA principles or other logic.
+            notifier_cell_id = "notifier_beta" # Assuming this cell is registered
+            if notifier_cell_id in self.cells:
+                print(f"Cortex: Data analysis by '{cell_id}' successful. Triggering notification via '{notifier_cell_id}'.")
+                notification_payload = {
+                    "action": "send_notification",
+                    "recipient": "admin@example.com", # Could come from DNA or event_data
+                    "message": f"Analysis by {cell_id} for action '{event_data.get('action_performed')}' complete. Details: {event_data.get('processed_info')}"
+                }
+                self.delegate_task_to_cell(notifier_cell_id, notification_payload)
+            else:
+                print(f"Cortex: Warning - Notifier cell '{notifier_cell_id}' not found for chaining.")
+
+    def handle_notification_sent(self, event_data):
+        """Handles completion of a 'send_notification' task."""
+        cell_id = event_data.get('cell_id', 'UnknownCell')
+        print(f"Cortex: Received 'send_notification.complete' event from '{cell_id}'. Notification details: {event_data.get('processed_info')}")
